@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: sf_application_t
+    config:
+      tags: ["daily"]
+  - name: sf_cl_contract_history_t
+    config:
+      tags: ["daily"]
+  - name: sf_cl_contract_t
+    config:
+      tags: ["daily"]
+  - name: sf_investment_order_t
+    config:
+      tags: ["daily"]
+  - name: sf_investor_fund_transaction_t
+    config:
+      tags: ["daily"]
+  - name: sf_investor_loan_transaction_t
+    config:
+      tags: ["daily"]
+  - name: sf_loan_payment_transaction_t
+    config:
+      tags: ["daily"]
+  - name: sf_party_t
+    config:
+      tags: ["daily"]
+  - name: wca_leads_inventory_t
+  - name: wca_summary_t
+    config:
+      tags: ["daily"]
+  - name: wca_log_report_t
+    config:
+      tags: ["daily"]
+  - name: wca_master_details_t
+    config:
+      tags: ["daily"]
+  - name: wca_scorecard_details_t
+    config:
+      tags: ["daily"]

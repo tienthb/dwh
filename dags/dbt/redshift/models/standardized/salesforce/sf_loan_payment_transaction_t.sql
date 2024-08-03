@@ -1,0 +1,68 @@
+{{ config(
+    materialized="incremental",
+    on_schema_change="append_new_columns",
+    unique_key="id",
+    alias="sf_loan_payment_transaction_t",
+    tags=["salesforce"]
+) }}
+
+{%- set unique_key = config.get('unique_key') -%}
+{%- set incr_key = 'lastmodifieddate' -%}
+{%- set column_list = 'borrower_account__c,
+    borrower_name__c,
+    commission_on_interest__c,
+    commission_on_late_fee__c,
+    gst_on_commission_on_interest__c,
+    gst_on_commission_on_late_fee__c,
+    gst_rate__c,
+    id,
+    loan__archived__c,
+    loan__balance__c,
+    loan__cleared__c,
+    loan__clearing_date__c,
+    loan__excess__c,
+    loan__fees__c,
+    loan_id__c,
+    loan__interest__c,
+    loan__interest_rate__c,
+    loan__late_charge_interest__c,
+    loan__late_charge_principal__c,
+    loan__loan_account__c,
+    loan__paid_to_broker__c,
+    loan__paid_to_broker_reversed__c,
+    loan__paid_to_investor__c,
+    loan__paid_to_investor_reversed__c,
+    loan__principal__c,
+    loan__rebate_amount__c,
+    loan__rebate_payment__c,
+    loan__receipt_date__c,
+    loan__receipt_id__c,
+    loan__rejected__c,
+    loan__reversed__c,
+    loan__total_charges_interest__c,
+    loan__total_charges_principal__c,
+    loan__transaction_amount__c,
+    loan__transaction_creation_date__c,
+    loan__transaction_date__c,
+    loan__transaction_time__c,
+    loan__waived__c,
+    cl_contract_status__c,
+    maturity_date__c,
+    product_type__c,
+    reason_for_waiver__c,
+    loan__cheque_date__c,
+    loan__cheque_number__c,
+    loan__id__c,
+    loan__installment_date__c,
+    loan__receipt_amount__c,
+    loan__rejection_date__c,
+    loan__rejection_reason__c,
+    loan__reversal_reason__c,
+    reversal_date__c,
+    createddate,
+    lastmodifieddate' -%}
+
+{% set src_table = "source." ~ config.get("alias")[:-2] %}
+{% set src_data = config.get("alias").split("_")[0] %}
+{{ gen_sql(unique_key, incr_key, column_list, src_data, src_table) | trim }}
+

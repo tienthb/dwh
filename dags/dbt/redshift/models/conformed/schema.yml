@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: cfm_wc_loan_t
+    config:
+      tags: ["daily"]
+  - name: cfm_wca_summary_t
+    config:
+      tags: ["daily"]

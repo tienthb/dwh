@@ -1,0 +1,18 @@
+config:
+  send_anonymous_usage_stats: false
+
+redshift:
+  outputs:
+    prod:
+      type: redshift
+      host: "{{ env_var('REDSHIFT_HOST', '') }}"
+      user: "{{ env_var('REDSHIFT_USER', '') }}"
+      password: "{{ env_var('REDSHIFT_PASSWORD', '') }}"
+      port: 5439
+      dbname: "{{ env_var('REDSHIFT_DBNAME', '') }}"
+      schema: public
+      threads: 4
+      region: ap-southeast-1
+      connect_timeout: 60
+
+  target: prod

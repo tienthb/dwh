@@ -1,0 +1,111 @@
+{{ config(
+    materialized="incremental",
+    on_schema_change="append_new_columns",
+    unique_key="master_id",
+    alias="cfm_wca_summary_t",
+    tags=["wca", "conformed"]
+) }}
+
+{% if is_incremental() %}
+WITH last_updated AS 
+(   
+    SELECT master_id, MAX(updated_date) updated_date
+    FROM {{ this }}
+    GROUP BY master_id
+)
+{% endif %}
+SELECT 
+    s.master_id,
+    s.hard_rules,
+	s.hard_rule_failure_reason,
+	s.grad, -- keep raw data for future enhancement
+    CASE WHEN LENGTH(s.grad) BETWEEN 1 AND 2 THEN s.grad::int2 END risk_grade,
+	s.pricing,
+	s.company_name,
+	COALESCE(s.score, lr.score)::DECIMAL(20, 4) AS score,
+	COALESCE(lr.pre_limit12, s.pre_limit12)::DECIMAL(20, 4) AS pre_limit12,
+	s.calculated_limit12,
+	s.uen,
+	s.bank_statement,
+	s.cbs_failure_reason,
+    s.fraud_rules,
+	s.fraud_rule_failure_reason,
+	lr.comments,
+	lr.fid_alert,
+	lr.industry_grade,
+	lr.pre_limit18,
+	lr.scenario,
+	lr.vendor_id,
+	lr.brcs_score,
+	lr.bri_cbs_score,
+	lr.bs_score,
+	lr.limit12,
+	lr.limit18,
+	lr.address_match,
+	lr.fid1_1,
+	lr.fid1_2,
+	lr.fid2,
+	lr.noa1,
+	lr.noa2,
+	lr.brcs1,
+	lr.brcs10,
+	lr.brcs11,
+	lr.brcs12,
+	lr.brcs13,
+	lr.brcs14,
+	lr.brcs15,
+	lr.brcs16,
+	lr.brcs17,
+	lr.brcs18,
+	lr.brcs19,
+	lr.brcs1_1,
+	lr.brcs1_2,
+	lr.brcs2,
+	lr.brcs20,
+	lr.brcs3,
+	lr.brcs3_1,
+	lr.brcs4,
+	lr.brcs5,
+	lr.brcs6,
+	lr.brcs7,
+	lr.brcs8,
+	lr.brcs9,
+	lr.bri1,
+	lr.bri2,
+	lr.bri3,
+	lr.bri4,
+	lr.bri5,
+	lr.bri6,
+	lr.bri7,
+	lr.bs1,
+	lr.bs2,
+	lr.bs3,
+	lr.bs4,
+	lr.bs5,
+	lr.bs6,
+	lr.bs7,
+	lr.bs8,
+	lr.bs9,
+	lr.cbs1,
+	lr.cbs10,
+	lr.cbs2,
+	lr.cbs3_2,
+	lr.cbs4,
+	lr.cbs5_2,
+	lr.cbs6,
+	lr.cbs7_1,
+	lr.cbs7_2,
+	lr.cbs8,
+	lr.cbs9,
+	GREATEST(s.updated_date, lr.updated_date) AS updated_date,
+	GETDATE() AS elt_updated_date,
+	s.brcs,
+    s.cbs,
+    {{ convert_str_to_number("bc_pd", "float") | trim }},
+	{{ convert_str_to_number("experian_pd", "float") | trim }}
+FROM {{ ref("wca_summary_t") }} s
+    LEFT JOIN {{ ref("wca_log_report_t") }} lr ON s.master_id = lr.master_id
+{% if is_incremental() %}
+    LEFT JOIN last_updated lu ON s.master_id = lu.master_id
+WHERE GREATEST(s.updated_date, lr.updated_date) > COALESCE(lu.updated_date, '1900-01-01')
+{% endif %}

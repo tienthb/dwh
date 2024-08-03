@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: enr_application_wc_v
+    config:
+      tags: ["daily"]
+  - name: enr_disbursed_wc_v
+    config:
+      tags: ["daily"]
